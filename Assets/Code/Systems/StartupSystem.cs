@@ -5,13 +5,13 @@ using Random = UnityEngine.Random;
 
 namespace Kk.BusyEcs
 {
-    [EcsSystemClass]
+    [EcsSystem]
     public class StartupSystem
     {
         [Inject] private IEnv _env = default;
 
-        [EcsSystem]
-        public void LoadLevel(EarlyUpdatePhase _, Entity entity, LevelLoadCommand command)
+        [EarlyUpdate]
+        public void LoadLevel(Entity entity, LevelLoadCommand command)
         {
             if (command.secondsRemaining > 0)
             {

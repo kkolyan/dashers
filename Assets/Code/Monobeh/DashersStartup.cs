@@ -1,4 +1,5 @@
 using System.Reflection;
+using Leopotam.EcsLite;
 using UnityEngine;
 
 namespace Kk.BusyEcs
@@ -7,28 +8,46 @@ namespace Kk.BusyEcs
     {
         private IEcsContainer _ecs;
         public LevelDef level;
+        private EcsSystems _ecsSystems;
 
         private void Start()
         {
-            _ecs = new EsContainerBuilder()
+            _ecsSystems = new EcsSystems(new EcsWorld());
+
+            _ecs = new EcsContainerBuilder()
+                .Integrate(_ecsSystems)
                 .Scan(Assembly.GetAssembly(typeof(DashersStartup)))
                 .End();
 
-            _ecs.GetWorlds().Add(new Leopotam.EcsLite.UnityEditor.EcsWorldDebugSystem());
-            _ecs.GetWorlds().Init();
+            SetupUnityLeoEcsLiteDebugger();
+            _ecsSystems.Init();
 
-            _ecs.NewEntity(new LevelLoadCommand { level = level, secondsRemaining = level.countdownSeconds});
-            
-            _ecs.Execute(new StartPhase());
+            _ecs.Execute<Start>();
+
+            _ecs.NewEntity(new LevelLoadCommand { level = level, secondsRemaining = level.countdownSeconds });
         }
 
         private void Update()
         {
-            _ecs.Execute(new EarlyUpdatePhase());
-            _ecs.Execute(new UpdatePhase());
-            _ecs.Execute(new LateUpdatePhase());
-            _ecs.Execute(new SuperLateUpdatePhase());
-            _ecs.GetWorlds().Run();
+            _ecsSystems.Run();
+            _ecs.Execute<EarlyUpdate>();
+            _ecs.Execute<Update>();
+            _ecs.Execute<LateUpdate>();
+            _ecs.Execute<SuperLateUpdate>();
+        }
+
+        private void OnDestroy()
+        {
+            _ecsSystems.Destroy();
+        }
+
+        private void SetupUnityLeoEcsLiteDebugger()
+        {
+            _ecsSystems.Add(new Leopotam.EcsLite.UnityEditor.EcsWorldDebugSystem());
+            foreach (string worldName in _ecsSystems.GetAllNamedWorlds().Keys)
+            {
+                _ecsSystems.Add(new Leopotam.EcsLite.UnityEditor.EcsWorldDebugSystem(worldName));
+            }
         }
     }
 }

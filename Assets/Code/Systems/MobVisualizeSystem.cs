@@ -2,11 +2,11 @@ using UnityEngine;
 
 namespace Kk.BusyEcs
 {
-    [EcsSystemClass]
+    [EcsSystem]
     public class MobVisualizeSystem
     {
-        [EcsSystem]
-        public void Visualize(LateUpdatePhase _, Entity entity, Go go, Position position, DasherSo def, ActionProgress progress)
+        [LateUpdate]
+        public void Visualize(Entity entity, Go go, Position position, DasherSo def, ActionProgress progress)
         {
             go.value.transform.localPosition = position.value;
 

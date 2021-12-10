@@ -2,15 +2,15 @@ using UnityEngine;
 
 namespace Kk.BusyEcs
 {
-    [EcsSystemClass]
+    [EcsSystem]
     public class DashSystem
     {
         [Inject] private IEnv _env;
 
-        [EcsSystem]
-        public void AimAi(UpdatePhase _, Entity entity, AiMind __, ActionProgress progress)
+        [Update]
+        public void AimAi(Entity entity, AiMind __, ActionProgress progress)
         {
-            if (progress.DoesNothing()) 
+            if (progress.DoesNothing())
             {
                 _env.Query((ref Position enemyPos, ref PlayerMind ___) =>
                 {
@@ -19,8 +19,8 @@ namespace Kk.BusyEcs
             }
         }
 
-        [EcsSystem]
-        public void AimPlayer(UpdatePhase _, Entity entity, PlayerMind __, ActionProgress progress)
+        [Update]
+        public void AimPlayer(Entity entity, PlayerMind __, ActionProgress progress)
         {
             if (progress.DoesNothing())
             {
@@ -37,21 +37,21 @@ namespace Kk.BusyEcs
             }
         }
 
-        [EcsSystem]
-        public void ExecuteDashCommand(UpdatePhase _, Entity commandEntity, DashCommand command)
+        [Update]
+        public void ExecuteDashCommand(Entity commandEntity, DashCommand command)
         {
             command.actor.Match((Entity entity, ref DasherSo def, ref Position position, ref ActionProgress progress) =>
             {
                 if (progress.DoesNothing())
                 {
                     Dasher.Dash dashDef = def.value.dash;
-                    
+
                     entity.Add(new DashAction(
                         speed: dashDef.distance / dashDef.duration,
                         direction: (command.target - position.value).normalized
                     ));
                     progress = new ActionProgress(
-                        mainDuration: dashDef.duration, 
+                        mainDuration: dashDef.duration,
                         cooldownDuration: dashDef.cooldown
                     );
                 }
@@ -59,23 +59,23 @@ namespace Kk.BusyEcs
             commandEntity.DelEntity();
         }
 
-        [EcsSystem]
-        public void Progress(LateUpdatePhase _, Entity entity, ref ActionProgress progress)
+        [LateUpdate]
+        public void Progress(Entity entity, ref ActionProgress progress)
         {
             progress.spent += Time.deltaTime;
         }
 
-        [EcsSystem]
-        public void ProgressDash(SuperLateUpdatePhase _, Entity entity, ref ActionProgress progress, ref DashAction dash)
+        [SuperLateUpdate]
+        public void ProgressDash(Entity entity, ref ActionProgress progress, ref DashAction dash)
         {
             if (progress.spent > progress.mainDuration)
             {
                 entity.Del<DashAction>();
             }
-        } 
+        }
 
-        [EcsSystem]
-        public void Move(UpdatePhase _, ref Position position, DashAction dash, ActionProgress progress)
+        [Update]
+        public void Move(ref Position position, DashAction dash, ActionProgress progress)
         {
             if (progress.spent <= progress.mainDuration)
             {
