@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2ff124de6c64638b7da6a349b08660d, type: 3}
+  m_Name: Player Mob Def
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 7342153465696092105, guid: f00324c55bcbf6649a0337603210a920, type: 3}
+  dash:
+    color: {r: 1, g: 0.74101985, b: 0, a: 1}
+    damage: 5
+    cooldown: 0.3
+    duration: 0.1
+    distance: 5
+  standby: {r: 0.09144165, g: 0.6226415, b: 0, a: 1}
+  recovering: {r: 0.013378504, g: 0.3018868, b: 0, a: 1}
